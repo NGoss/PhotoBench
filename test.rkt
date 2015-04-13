@@ -6,24 +6,10 @@
 ;;http://docs.racket-lang.org/images/index.html
 ;;http://docs.racket-lang.org/images/flomap_title.html
 
-(define fm
-  (draw-flomap
-   (lambda (fm-dc)
-     (send fm-dc set-alpha 0)
-     (send fm-dc set-background "black")
-     (send fm-dc clear)
-     (send fm-dc set-alpha 1/3)
-     (send fm-dc translate 2 2)
-     ;;(send fm-dc set-pen "white" 5 'solid)
-     (send fm-dc set-brush "red" 'solid)
-     (send fm-dc draw-ellipse 0 0 192 192)
-     (send fm-dc set-brush "green" 'solid)
-     (send fm-dc draw-ellipse 64 0 192 192)
-     (send fm-dc set-brush "blue" 'solid)
-     (send fm-dc draw-ellipse 32 44 192 192))
-   260 240))
 
-(define filename "usa.bmp")
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Backend image opening code;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define filename "usa.bmp")                  ;;Set the name of the file to be opened...
 
 (define (get-symbol filename)
   (define extension (substring filename (- (string-length filename) 3)))
@@ -35,6 +21,11 @@
 
 ;(read-bitmap)
 (define base-image (read-bitmap filename (get-symbol filename)))
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Backend image manip code;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (define (saturation fm sat)
   (define-values (x y) (flomap-size fm))
