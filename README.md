@@ -2,6 +2,6 @@
 
 V0.1
 
-*Base GUI added
+* Base GUI added
 
-*Image handling
+* Image handling
