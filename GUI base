@@ -1,6 +1,8 @@
 #lang racket
 
-(require racket/gui/base)
+(require racket/gui/base
+         racket/include
+         (file "test.rkt"))
 
 ;;Creates the top level window
 (define frame (new frame%
@@ -54,10 +56,10 @@
                        [stretchable-width #f]))
 
 (new button% [parent iconpanel]
-     [label "1"]
+     [label "Open"]
      ; Button Click, changes the message
      [callback (lambda (button event)
-                 (send msg set-label "1"))])
+                 (open-file "file.bmp" canvas))])
 
 (define canvas (new canvas% [parent overall]
                     [style '(border)]))
