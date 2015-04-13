@@ -1,7 +1,8 @@
 #lang racket
 
 (require images/flomap
-         racket/draw)
+         racket/draw
+         racket/gui/base)
 
 ;;http://docs.racket-lang.org/images/index.html
 ;;http://docs.racket-lang.org/images/flomap_title.html
