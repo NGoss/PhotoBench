@@ -20,4 +20,10 @@
     ((equal? extension "jpg") 'jpg)))
 
 ;(read-bitmap)
-(define base-image (read-bitmap filename (get-symbol filename)))
+(define (open-file filename canvas)
+  (define base-image (read-bitmap filename (get-symbol filename)))
+  (define dc (send canvas get-dc))
+  (send dc draw-bitmap base-image 0 0)
+  base-image)
+
+(provide open-file)
