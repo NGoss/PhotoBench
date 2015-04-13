@@ -10,29 +10,38 @@
 
 ;;Words for the window
 (define msg (new message% [parent frame]
-                 [label "HELLO! HELLO! HELLO! HELLO!"]))
+                 [label "HELLO! HELLO! HELLO! HELLO!"]
+                 [auto-resize #t]))
 
 
 ;;Menu bar, start
 (define menubar (new menu-bar% [parent frame]))
 
-(define menufile (new menu% 
+(define menufile (new menu%              ;;file menu
                    [label "File"]
                    [parent menubar]))
 
-(define menuedit (new menu%
+(define menuedit (new menu%              ;;edit menu
                       [label "Edit"]
                       [parent menubar]))
 
-(define test (new menu-item%
+(define test (new menu-item%             ;;placeholder
                   [label "asdasf2"]
                   [parent menufile]
-                  [callback (lambda (b e)(send msg set-label "2"))]))
+                  [callback (lambda (b e)(send msg set-label "doing file stuff"))]))
 
-(define test2 (new menu-item%
+(define savebutt (new menu-item%        ;;save, creates a popup dialog
+                      [label "Save"]
+                      [parent menufile]
+                      [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure"]
+                                                   [parent frame])))
+                                                (send m show #t))
+                                  )]))
+
+(define test2 (new menu-item%             ;;placeholder
                   [label "asdasf2"]
                   [parent menuedit]
-                  [callback (lambda (b e)(send msg set-label "3"))]))
+                  [callback (lambda (b e)(send msg set-label "doing edit stuff"))]))
 
 ;USed for spacing
 (define overall (new horizontal-panel% [parent frame]
