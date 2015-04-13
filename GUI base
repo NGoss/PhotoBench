@@ -1,8 +1,6 @@
 #lang racket
 
-(require racket/gui/base
-         racket/include
-         (file "test.rkt"))
+(require racket/gui/base)
 
 ;;Creates the top level window
 (define frame (new frame%
@@ -56,12 +54,20 @@
                        [stretchable-width #f]))
 
 (new button% [parent iconpanel]
-     [label "Open"]
+     [label "1"]
      ; Button Click, changes the message
      [callback (lambda (button event)
-                 (open-file "file.bmp" canvas))])
+                 (send msg set-label "1"))])
 
-(define canvas (new canvas% [parent overall]
-                    [style '(border)]))
+;;editor canvas.  uses imagesnip on pasteboard on editorcanvas to display image.
+(define canvas (new editor-canvas% [parent overall]
+                    [style '(control-border)]))
+
+;readup
+;http://docs.racket-lang.org/gui/image-snip_.html#%28meth._%28%28%28lib._racket%2Fsnip..rkt%29._image-snip~25%29._load-file%29%29
+;http://docs.racket-lang.org/gui/pasteboard_.html
+;http://docs.racket-lang.org/gui/editor-canvas_.html
+
+
 
 (send frame show #t)
