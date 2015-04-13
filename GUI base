@@ -1,0 +1,56 @@
+#lang racket
+
+(require racket/gui/base)
+
+;;Creates the top level window
+(define frame (new frame%
+                   [label "Photobench"]
+                   [width 900]
+                   [height 600]))
+
+;;Words for the window
+(define msg (new message% [parent frame]
+                 [label "HELLO! HELLO! HELLO! HELLO!"]))
+
+
+;;Menu bar, start
+(define menubar (new menu-bar% [parent frame]))
+
+(define menufile (new menu% 
+                   [label "File"]
+                   [parent menubar]))
+
+(define menuedit (new menu%
+                      [label "Edit"]
+                      [parent menubar]))
+
+(define test (new menu-item%
+                  [label "asdasf2"]
+                  [parent menufile]
+                  [callback (lambda (b e)(send msg set-label "2"))]))
+
+(define test2 (new menu-item%
+                  [label "asdasf2"]
+                  [parent menuedit]
+                  [callback (lambda (b e)(send msg set-label "3"))]))
+
+;USed for spacing
+(define overall (new horizontal-panel% [parent frame]
+                 ))
+
+(define iconpanel (new vertical-panel% [parent overall]
+                       [style '(border)]
+                       [border 2]
+                       [min-width 100]
+                       [stretchable-width #f]))
+
+(new button% [parent iconpanel]
+     [label "1"]
+     ; Button Click, changes the message
+     [callback (lambda (button event)
+                 (send msg set-label "1"))])
+
+(define canvas (new canvas% [parent overall]
+                    [style '(border)]))
+
+(send frame show #t)
