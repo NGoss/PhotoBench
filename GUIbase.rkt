@@ -55,11 +55,11 @@
                        [min-width 100]
                        [stretchable-width #f]))
 
-(new button% [parent iconpanel]
+(define openbutton (new button% [parent iconpanel]
      [label "Open"]
      ; Button Click, changes the message
      [callback (lambda (button event)
-                 (open-file "file.bmp" canvas))])
+                 (open-file "file.bmp" canvas))]))
 
 (define canvas (new canvas% [parent overall]
                     [style '(border)]))
