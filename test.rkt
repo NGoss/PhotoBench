@@ -54,6 +54,16 @@
   (define fmblue (saturation (get-blue fm) k))
   (fm+ fm fmblue))
 
+(define (white-balance fm type)
+  (cond
+    ((eq? type 'fluorescent) (enhance-blue fm 0.75))
+    ((eq? type 'outdoors) (begin (enhance-red fm 0.75)
+                                 (enhance-green fm 0.75)))))
+
+(define (adjust-gamma fm k)
+  (flomap-append-components (flomap-take-components fm 1)
+                            (fm* k (flomap-drop-components fm 1))))
+
 (define (dispatch method k bmp)
   (define fm (bitmap->flomap bmp))
     (cond
