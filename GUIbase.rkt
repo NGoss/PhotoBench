@@ -20,8 +20,8 @@
 (define menubar (new menu-bar% [parent frame]))
 
 (define menufile (new menu%              ;;file menu
-                   [label "File"]
-                   [parent menubar]))
+                      [label "File"]
+                      [parent menubar]))
 
 (define menuedit (new menu%              ;;edit menu
                       [label "Edit"]
@@ -36,18 +36,18 @@
                       [label "Save"]
                       [parent menufile]
                       [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure"]
-                                                   [parent frame])))
+                                                            [parent frame])))
                                                 (send m show #t))
                                   )]))
 
 (define test2 (new menu-item%             ;;placeholder
-                  [label "asdasf2"]
-                  [parent menuedit]
-                  [callback (lambda (b e)(send msg set-label "doing edit stuff"))]))
+                   [label "asdasf2"]
+                   [parent menuedit]
+                   [callback (lambda (b e)(send msg set-label "doing edit stuff"))]))
 
 ;USed for spacing
 (define overall (new horizontal-panel% [parent frame]
-                 ))
+                     ))
 
 (define iconpanel (new vertical-panel% [parent overall]
                        [style '(border)]
@@ -56,12 +56,26 @@
                        [stretchable-width #f]))
 
 (define openbutton (new button% [parent iconpanel]
-     [label "Open"]
-     ; Button Click, changes the message
-     [callback (lambda (button event)
-                 (open-file "file.bmp" canvas))]))
+                        [label "Open"]
+                        ; Button Click, changes the message
+                        [callback (lambda (button event)
+                                    (open-file "file.bmp" canvas))]))
+
+(define colorbutton (new button% [parent iconpanel]
+                         [label "Color Balance"]
+                         ; Button Click, changes the message
+                         [callback (lambda (button event)
+                                     (let ((m (new dialog% [label "Are you sure"]
+                                                   [parent frame])))
+                                       (send m show #t)))]))
 
 (define canvas (new canvas% [parent overall]
                     [style '(border)]))
 
 (send frame show #t)
+
+
+
+
+
+;;;;;;;; Color sliders here ;;;;;;;;;;;;;;;
