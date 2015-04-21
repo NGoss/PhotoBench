@@ -10,8 +10,6 @@
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;Backend image opening code;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define filename "usa.bmp")                  ;;Set the name of the file to be opened...
-
 (define (get-symbol filename)
   (define extension (substring filename (- (string-length filename) 3)))
   (cond
@@ -56,8 +54,8 @@
   (define fmblue (saturation (get-blue fm) k))
   (fm+ fm fmblue))
 
-(define (dispatch method k)
-  (define fm (bitmap->flomap base-image))
+(define (dispatch method k bmp)
+  (define fm (bitmap->flomap bmp))
     (cond
       ((eq? method 'enhance-blue) (flomap->bitmap (enhance-blue fm k)))
       ((eq? method 'enhance-red) (flomap->bitmap (enhance-red fm k)))
