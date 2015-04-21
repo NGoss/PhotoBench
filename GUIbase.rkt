@@ -65,9 +65,7 @@
                          [label "Color Balance"]
                          ; Button Click, changes the message
                          [callback (lambda (button event)
-                                     (let ((m (new dialog% [label "Are you sure"]
-                                                   [parent frame])))
-                                       (send m show #t)))]))
+                                     (send colDialog show #t))]))
 
 (define canvas (new canvas% [parent overall]
                     [style '(border)]))
@@ -75,7 +73,50 @@
 (send frame show #t)
 
 
-
-
-
 ;;;;;;;; Color sliders here ;;;;;;;;;;;;;;;
+(define colDialog (new dialog% [label "Color Change"]
+                       [parent frame]))
+
+(define rslider (new slider%
+                     (label "Red  ")
+                     (parent colDialog)
+                     (min-value 0)
+                     (max-value 200)
+                     (init-value 100)
+                     (min-width 200)
+                     (stretchable-width #f)))
+
+(define gslider (new slider%
+                     (label "Green")
+                     (parent colDialog)
+                     (min-value 0)
+                     (max-value 200)
+                     (init-value 100)
+                     (min-width 200)
+                     (stretchable-width #f)))
+
+(define bslider (new slider%
+                     (label "Blue ")
+                     (parent colDialog)
+                     (min-value 0)
+                     (max-value 200)
+                     (init-value 100)
+                     (min-width 200)
+                     (stretchable-width #f)))
+
+(define wslider (new slider%
+                     (label "White")
+                     (parent colDialog)
+                     (min-value 0)
+                     (max-value 200)
+                     (init-value 100)
+                     (min-width 200)
+                     (stretchable-width #f)))
+
+(define colorOk (new button% [parent colDialog]
+                         [label "OK"]
+                         ; Button Click, changes the message
+                         [callback (lambda (button event)
+                                     (send msg set-label "LINK UP"))]))
+
+
