@@ -28,3 +28,30 @@
   base-image)
 
 (provide open-file)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;level-manipulation code;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(define (saturation fm sat)
+  (define-values (x y) (flomap-size fm))
+  (define fmsat (build-flomap 1 x y (lambda (k x y) sat)))
+  (fm* fm fmsat))
+
+(define (get-red fm)
+  (fm* fm (flomap-ref-component fm 1)))
+
+(define (enhance-red fm k)
+  (define fmred (saturation (get-red fm) k))
+  (fm+ fm fmred))
+
+(define (get-green fm)
+  (fm* fm (flomap-ref-component fm 2)))
+
+(define (enhance-green fm k)
+  (define fmgreen (saturation (get-green fm) k))
+  (fm+ fm fmgreen))
+
+(define (get-blue fm)
+  (fm* fm (flomap-ref-component fm 3)))
+
+(define (enhance-blue fm k)
+  (define fmblue (saturation (get-blue fm) k))
+  (fm+ fm fmblue))
