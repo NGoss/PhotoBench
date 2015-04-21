@@ -55,3 +55,15 @@
 (define (enhance-blue fm k)
   (define fmblue (saturation (get-blue fm) k))
   (fm+ fm fmblue))
+
+(define (dispatch method k)
+  (define fm (bitmap->flomap base-image))
+    (cond
+      ((eq? method 'enhance-blue) (flomap->bitmap (enhance-blue fm k)))
+      ((eq? method 'enhance-red) (flomap->bitmap (enhance-red fm k)))
+      ((eq? method 'enhance-green) (flomap->bitmap (enhance-green fm k)))
+      ((eq? method 'saturation) (flomap->bitmap (saturation fm k)))
+      ((eq? method 'white-balance) (flomap->bitmap (white-balance fm k)))
+      ((eq? method 'gamma) (flomap->bitmap (adjust-gamma fm k)))))
+
+(provide dispatch)
