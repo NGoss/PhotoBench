@@ -2,7 +2,13 @@
 
 (require racket/gui/base
          racket/include
+         images/flomap
          (file "test.rkt"))
+
+(define m 1)
+
+;output file
+;(define out (open-output-file "data.png" #:exists 'replace))
 
 ;;Creates the top level window
 (define frame (new frame%
@@ -59,13 +65,19 @@
                         [label "Open"]
                         ; Button Click, changes the message
                         [callback (lambda (button event)
-                                    (open-file "file.bmp" canvas))]))
+                                    (open-file "file.bmp" canvas)
+                                    (send (read-bitmap "file.bmp") save-file "data.png" 'png))]))
 
 (define colorbutton (new button% [parent iconpanel]
                          [label "Color Balance"]
-                         ; Button Click, changes the message
                          [callback (lambda (button event)
                                      (send colDialog show #t))]))
+
+(define gwbutton (new button% [parent iconpanel]
+                      [label "Gamma/White"]
+                      ; Button Click, changes the message
+                      [callback (lambda (button event)
+                                  (send gwdia show #t))]))
 
 (define canvas (new canvas% [parent overall]
                     [style '(border)]))
@@ -78,7 +90,7 @@
                        [parent frame]))
 
 (define rslider (new slider%
-                     (label "Red  ")
+                     (label "Red       ")
                      (parent colDialog)
                      (min-value 0)
                      (max-value 200)
@@ -87,7 +99,7 @@
                      (stretchable-width #f)))
 
 (define gslider (new slider%
-                     (label "Green")
+                     (label "Green    ")
                      (parent colDialog)
                      (min-value 0)
                      (max-value 200)
@@ -96,7 +108,7 @@
                      (stretchable-width #f)))
 
 (define bslider (new slider%
-                     (label "Blue ")
+                     (label "Blue      ")
                      (parent colDialog)
                      (min-value 0)
                      (max-value 200)
@@ -104,19 +116,85 @@
                      (min-width 200)
                      (stretchable-width #f)))
 
-(define wslider (new slider%
-                     (label "White")
-                     (parent colDialog)
-                     (min-value 0)
-                     (max-value 200)
-                     (init-value 100)
-                     (min-width 200)
-                     (stretchable-width #f)))
+(define gwdia (new dialog% [label "Gamma/White"]
+                   [parent frame]))
+
+(define gammaslider (new slider%
+                         (label "Gamma")
+                         (parent gwdia)
+                         (min-value 0)
+                         (max-value 200)
+                         (init-value 100)
+                         (min-width 200)
+                         (stretchable-width #f)))
+
+(define satslider (new slider%
+                         (label "Saturation")
+                         (parent gwdia)
+                         (min-value 0)
+                         (max-value 200)
+                         (init-value 100)
+                         (min-width 200)
+                         (stretchable-width #f)))
+
+(define wbal (new list-box%
+                  (label "White Balance    ")
+                  (parent gwdia)
+                  (choices (list "Fluorescent" "Outdoors" "None"))))
+
+(define gwOk (new button% [parent gwdia]
+                  [label "OK"]
+                  [callback (lambda (button event)
+                              (send (dispatch 'gamma 
+                                              (/ (send gammaslider get-value) 100) 
+                                              (read-bitmap "data.png"))
+                                    save-file "data.png" 'png)
+                              (send (dispatch 'saturation
+                                              (/ (send satslider get-value) 100) 
+                                              (read-bitmap "data.png"))
+                                    save-file "data.png" 'png)
+                              (cond [(equal? (send wbal get-selections) '()) 'none]
+                                [(= 0 (car (send wbal get-selections))) 
+                                     (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
+                                           save-file "data.png" 'png)]
+                                    [(= 1 (car (send wbal get-selections))) 
+                                     (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
+                                           save-file "data.png" 'png)]
+                                    [else 'none]) 
+                              (open-file "data.png" canvas)
+                              (send gwdia show #f)
+                              )]))
+
+
 
 (define colorOk (new button% [parent colDialog]
-                         [label "OK"]
-                         ; Button Click, changes the message
-                         [callback (lambda (button event)
-                                     (send msg set-label "LINK UP"))]))
+                     [label "OK"]
+                     ; Button Click, changes the message
+                     [callback (lambda (button event)
+                                 (send msg set-label "LINK UP")
+                                 (send (dispatch 'enhance-red 
+                                                 (/ (send rslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (send (dispatch 'enhance-green
+                                                 (/ (send gslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (send (dispatch 'enhance-blue
+                                                 (/ (send bslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (open-file "data.png" canvas)
+                                 (send colDialog show #f)
+                                 )]))
+
+
+;;;write button temporarily removed
+;(define Write (new button% [parent iconpanel]
+;                         [label "Write"]
+;                         [callback (lambda (button event)
+;                                     (send msg set-label "Writing")
+;                                     (open-file "data.png" canvas))]))
+
 
 
