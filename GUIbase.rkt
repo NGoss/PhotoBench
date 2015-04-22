@@ -201,12 +201,11 @@
                                  )]))
 
 
-;;;write button temporarily removed
-;(define Write (new button% [parent iconpanel]
-;                         [label "Write"]
-;                         [callback (lambda (button event)
-;                                     (send msg set-label "Writing")
-;                                     (open-file "data.png" canvas))]))
+;;;spin button temporarily removed
+(define spin (new button% [parent iconpanel]
+                         [label "Spin"]
+                         [callback (lambda (button event)
+                                     (send (send canvas get-dc) rotate 3))]))
 
 
 
