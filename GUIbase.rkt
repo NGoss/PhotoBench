@@ -77,8 +77,9 @@
                         [label "Open"]
                         ; Button Click, changes the message
                         [callback (lambda (button event)
-                                    (open-file "file.bmp" canvas)
-                                    (send (read-bitmap "file.bmp") save-file "data.png" 'png))]))
+                                    (send (send canvas get-dc) draw-bitmap fm 0 0);(open-file "file.bmp" canvas)
+                                    (send fm;(read-bitmap "file.bmp") 
+                                          save-file "data.png" 'png))]))
 
 (define colorbutton (new button% [parent iconpanel]
                          [label "Color Balance"]
@@ -157,6 +158,7 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
+                              (send (send canvas get-dc) erase)
                               (send (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
                                               (read-bitmap "data.png"))
@@ -184,31 +186,40 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 ;                                 (send (dispatch 'enhance-red 
-                                 ;                                                 (/ (send rslider get-value) 100) 
-                                 ;                                                 (read-bitmap "data.png"))
-                                 ;                                       save-file "data.png" 'png)
-                                 ;                                 (send (dispatch 'enhance-green
-                                 ;                                                 (/ (send gslider get-value) 100) 
-                                 ;                                                 (read-bitmap "data.png"))
-                                 ;                                       save-file "data.png" 'png)
-                                 ;                                 (send (dispatch 'enhance-blue
-                                 ;                                                 (/ (send bslider get-value) 100) 
-                                 ;                                                 (read-bitmap "data.png"))
-                                 ;                                       save-file "data.png" 'png)
-                                 ;                                 (open-file "data.png" canvas)
-                                 (send (send canvas get-dc)
-                                       draw-bitmap
-                                       (dispatch 'enhance-red
-                                           (/ (send rslider get-value) 100)
-                                           (dispatch 'enhance-green
-                                                      (/ (send gslider get-value) 100)
-                                                      (dispatch 'enhance-blue
-                                                                 (/ (send bslider get-value) 100)
-                                                                 (read-bitmap "file.bmp"))))
-                                       0
-                                       0)
-                                 (send colDialog show #f)
+                                 (send (send canvas get-dc) erase)
+                                 (send (dispatch 'enhance-red 
+                                                 (/ (send rslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (send (dispatch 'enhance-green
+                                                 (/ (send gslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (send (dispatch 'enhance-blue
+                                                 (/ (send bslider get-value) 100) 
+                                                 (read-bitmap "data.png"))
+                                       save-file "data.png" 'png)
+                                 (open-file "data.png" canvas)
+                                 ;                                 (send (send canvas get-dc)
+                                 ;                                      draw-bitmap
+                                 ;                                     (dispatch 'enhance-red
+                                 ;                                              (/ (send rslider get-value) 100)
+                                 ;                                             (dispatch 'enhance-green
+                                 ;                                                   (/ (send gslider get-value) 100)
+                                 ;                                                      (dispatch 'enhance-blue
+                                 ;                                                               (/ (send bslider get-value) 100)
+                                 ;                                                              fm)));(read-bitmap "file.bmp"))
+                                 ;                              0
+                                 ;                             0)
+                                 ;                      (send (dispatch 'enhance-red
+                                 ;                                     (/ (send rslider get-value) 100)
+                                 ;                                    (dispatch 'enhance-green
+                                 ;                                             (/ (send gslider get-value) 100)
+                                 ;                                            (dispatch 'enhance-blue
+                                 ;                                                     (/ (send bslider get-value) 100)
+                                 ;                                                    fm;(read-bitmap "file.bmp")
+                                 ;                                                   ))) save-file "data.png" 'png)
+                                 ;              (send colDialog show #f)
                                  )]))
 
 
@@ -218,5 +229,24 @@
                   [callback (lambda (button event)
                               (send (send canvas get-dc) rotate 3))]))
 
+
+
+;test bmp
+(define fm
+  (flomap->bitmap
+   (draw-flomap
+    (lambda (fm-dc)
+      (send fm-dc set-alpha 0)
+      (send fm-dc set-background "black")
+      (send fm-dc clear)
+      (send fm-dc set-alpha 1/3)
+      (send fm-dc translate 2 2)
+      (send fm-dc set-brush "red" 'solid)
+      (send fm-dc draw-ellipse 0 0 192 192)
+      (send fm-dc set-brush "green" 'solid)
+      (send fm-dc draw-ellipse 64 0 192 192)
+      (send fm-dc set-brush "blue" 'solid)
+      (send fm-dc draw-ellipse 32 44 192 192))
+    260 240)))
 
 
