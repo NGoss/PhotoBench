@@ -39,19 +39,19 @@
                       [parent menufile]
                       [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure?"]
                                                             [parent frame])))
-                                                    (define n (new text-field% [label "Name:"] [parent m] [init-value "data.png"]))
-                                                    (define o (new button% [parent m]
-                                                            [label "OK"]
-                                                            [callback (lambda (button event)
-                                                                        (rename-file-or-directory "data.png"
-                                                                               (string-append (send n get-value)
-                                                                                              ".png")))]))
-                                                    (define p (new button% [parent m]
-                                                            [label "Close"]
-                                                            [callback (lambda (button event)
-                                                                        (send m show #f))]))
+                                                (define n (new text-field% [label "Name:"] [parent m] [init-value "data.png"]))
+                                                (define o (new button% [parent m]
+                                                               [label "OK"]
+                                                               [callback (lambda (button event)
+                                                                           (rename-file-or-directory "data.png"
+                                                                                                     (string-append (send n get-value)
+                                                                                                                    ".png")))]))
+                                                (define p (new button% [parent m]
+                                                               [label "Close"]
+                                                               [callback (lambda (button event)
+                                                                           (send m show #f))]))
                                                 (send m show #t)))
-                                  ]))
+                                ]))
 
 (define test (new menu-item%             ;;Close function
                   [label "Close"]
@@ -184,28 +184,39 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 (send (dispatch 'enhance-red 
-                                                 (/ (send rslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
-                                       save-file "data.png" 'png)
-                                 (send (dispatch 'enhance-green
-                                                 (/ (send gslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
-                                       save-file "data.png" 'png)
-                                 (send (dispatch 'enhance-blue
-                                                 (/ (send bslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
-                                       save-file "data.png" 'png)
-                                 (open-file "data.png" canvas)
+                                 ;                                 (send (dispatch 'enhance-red 
+                                 ;                                                 (/ (send rslider get-value) 100) 
+                                 ;                                                 (read-bitmap "data.png"))
+                                 ;                                       save-file "data.png" 'png)
+                                 ;                                 (send (dispatch 'enhance-green
+                                 ;                                                 (/ (send gslider get-value) 100) 
+                                 ;                                                 (read-bitmap "data.png"))
+                                 ;                                       save-file "data.png" 'png)
+                                 ;                                 (send (dispatch 'enhance-blue
+                                 ;                                                 (/ (send bslider get-value) 100) 
+                                 ;                                                 (read-bitmap "data.png"))
+                                 ;                                       save-file "data.png" 'png)
+                                 ;                                 (open-file "data.png" canvas)
+                                 (send (send canvas get-dc)
+                                       draw-bitmap
+                                       (dispatch 'enhance-red
+                                           (/ (send rslider get-value) 100)
+                                           (dispatch 'enhance-green
+                                                      (/ (send gslider get-value) 100)
+                                                      (dispatch 'enhance-blue
+                                                                 (/ (send bslider get-value) 100)
+                                                                 (read-bitmap "file.bmp"))))
+                                       0
+                                       0)
                                  (send colDialog show #f)
                                  )]))
 
 
 ;;;spin button temporarily removed
 (define spin (new button% [parent iconpanel]
-                         [label "Spin"]
-                         [callback (lambda (button event)
-                                     (send (send canvas get-dc) rotate 3))]))
+                  [label "Spin"]
+                  [callback (lambda (button event)
+                              (send (send canvas get-dc) rotate 3))]))
 
 
 
