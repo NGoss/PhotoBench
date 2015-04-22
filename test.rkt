@@ -75,3 +75,47 @@
       ((eq? method 'gamma) (flomap->bitmap (adjust-gamma fm k)))))
 
 (provide dispatch)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;painting tools;;;;;;;;;;;;;;;;;;;;;;
+(define (freeform-brush x y bmp)
+  (define-values (bmp-x bmp-y) (flomap-size (bitmap->flomap bmp)))
+  (fm+ (bitmap->flomap bmp)
+       (draw-flomap
+        (lambda (fm-dc)
+          (send fm-dc set-alpha 0)
+          (send fm-dc set-background "black")
+          (send fm-dc clear)
+          (send fm-dc set-alpha 1)
+          (send fm-dc set-pen "black" 5 'dot)
+          (send fm-dc draw-point x y))
+        bmp-x bmp-y)))
+
+(define (line-brush x1 x2 y1 y2 bmp)
+  (define-values (bmp-x bmp-y) (flomap-size (bitmap->flomap bmp)))
+  (fm+ (bitmap->flomap bmp)
+       (draw-flomap
+        (lambda (fm-dc)
+          (send fm-dc set-alpha 0)
+          (send fm-dc set-background "black")
+          (send fm-dc clear)
+          (send fm-dc set-alpha 1)
+          (send fm-dc set-pen "black" 5 'solid)
+          (send fm-dc draw-line x1 y1 x2 y2))
+        bmp-x bmp-y)))
+
+(define (erase x y bmp)
+  (define-values (bmp-x bmp-y) (flomap-size (bitmap->flomap bmp)))
+  (fm+ (bitmap->flomap bmp)
+       (draw-flomap
+        (lambda (fm-dc)
+          (send fm-dc set-alpha 0)
+          (send fm-dc set-background "black")
+          (send fm-dc clear)
+          (send fm-dc set-alpha 1)
+          (send fm-dc set-pen "white" 15 'dot)
+          (send fm-dc draw-point x y))
+        bmp-x bmp-y)))
+
+(provide erase)
+(provide line-brush)
+(provide freeform-brush)
