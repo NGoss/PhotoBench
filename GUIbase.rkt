@@ -5,7 +5,7 @@
          images/flomap
          (file "test.rkt"))
 
-(define m 1)
+
 
 ;output file
 ;(define out (open-output-file "data.png" #:exists 'replace))
@@ -33,18 +33,30 @@
                       [label "Edit"]
                       [parent menubar]))
 
-(define test (new menu-item%             ;;placeholder
-                  [label "asdasf2"]
-                  [parent menufile]
-                  [callback (lambda (b e)(send msg set-label "doing file stuff"))]))
 
 (define savebutt (new menu-item%        ;;save, creates a popup dialog
                       [label "Save"]
                       [parent menufile]
-                      [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure"]
+                      [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure?"]
                                                             [parent frame])))
-                                                (send m show #t))
-                                  )]))
+                                                    (define n (new text-field% [label "Name:"] [parent m] [init-value "data.png"]))
+                                                    (define o (new button% [parent m]
+                                                            [label "OK"]
+                                                            [callback (lambda (button event)
+                                                                        (rename-file-or-directory "data.png"
+                                                                               (string-append (send n get-value)
+                                                                                              ".png")))]))
+                                                    (define p (new button% [parent m]
+                                                            [label "Close"]
+                                                            [callback (lambda (button event)
+                                                                        (send m show #f))]))
+                                                (send m show #t)))
+                                  ]))
+
+(define test (new menu-item%             ;;Close function
+                  [label "Close"]
+                  [parent menufile]
+                  [callback (lambda (b e)(send frame show #f))]))
 
 (define test2 (new menu-item%             ;;placeholder
                    [label "asdasf2"]
@@ -129,13 +141,13 @@
                          (stretchable-width #f)))
 
 (define satslider (new slider%
-                         (label "Saturation")
-                         (parent gwdia)
-                         (min-value 0)
-                         (max-value 200)
-                         (init-value 100)
-                         (min-width 200)
-                         (stretchable-width #f)))
+                       (label "Saturation")
+                       (parent gwdia)
+                       (min-value 0)
+                       (max-value 200)
+                       (init-value 100)
+                       (min-width 200)
+                       (stretchable-width #f)))
 
 (define wbal (new list-box%
                   (label "White Balance    ")
@@ -154,7 +166,7 @@
                                               (read-bitmap "data.png"))
                                     save-file "data.png" 'png)
                               (cond [(equal? (send wbal get-selections) '()) 'none]
-                                [(= 0 (car (send wbal get-selections))) 
+                                    [(= 0 (car (send wbal get-selections))) 
                                      (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
                                            save-file "data.png" 'png)]
                                     [(= 1 (car (send wbal get-selections))) 
