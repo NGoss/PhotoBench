@@ -19,7 +19,7 @@ Identify the OPL concepts demonstrated in your project. Be brief. A simple list 
 * **The abstraction barrier** is in full force in this project, as not only does it separate the user from the program code, it also separates the backend from the frontend code. In this way, the abstraction barrier is kept at both the user level and the code level.
 
 ##External Technology and Libraries
-For this project, we used the [/images/flomap](docs.racket-lang.org/images/flomap_title.html) and [/gui/base](http://docs.racket-lang.org/gui/) libraries extensively. ......(Will be adding more)
+For this project, we used the [/images/flomap](docs.racket-lang.org/images/flomap_title.html) and [/gui/base](http://docs.racket-lang.org/gui/) libraries extensively. In addition to those, we also used the [/draw](http://docs.racket-lang.org/draw/index.html?q=) library, and the [/include](http://docs.racket-lang.org/reference/include.html) library.
 
 ##Favorite Lines of Code
 ####Nathan
