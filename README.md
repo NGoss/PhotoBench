@@ -19,15 +19,13 @@ Identify the OPL concepts demonstrated in your project. Be brief. A simple list 
 * **The abstraction barrier** is in full force in this project, as not only does it separate the user from the program code, it also separates the backend from the frontend code. In this way, the abstraction barrier is kept at both the user level and the code level.
 
 ##External Technology and Libraries
-For this project, we used the /images/flomap and /gui/base libraries extensively. ......(Will be adding more)
+For this project, we used the [/images/flomap](docs.racket-lang.org/images/flomap_title.html) and [/gui/base](http://docs.racket-lang.org/gui/) libraries extensively. ......(Will be adding more)
 
 ##Favorite Lines of Code
 ####Nathan
-Each team member should identify a favorite line of code, expression, or procedure written by them, and explain what it does. Why is it your favorite? What OPL philosophy does it embody?
-Remember code looks something like this:
 My favorite piece of code for this project is a little long, but is an important piece of the backend, as it allowed me to only give the frontend access to one procedure, instead of all of them. Using this code, all procedure calls from the frontend simply go through this and are routed to the desired procedure.
 ```scheme
-efine (dispatch method k)
+define (dispatch method k)
   (define fm (bitmap->flomap base-image))
     (cond
       ((eq? method 'enhance-blue) (flomap->bitmap (enhance-blue fm k)))
