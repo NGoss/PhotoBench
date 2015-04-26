@@ -11,7 +11,6 @@ These days, everything is documented by photos. People take them every day, both
 ![Imgur](http://i.imgur.com/orE34KW.png)
 
 ##Concepts Demonstrated
-Identify the OPL concepts demonstrated in your project. Be brief. A simple list and example is sufficient. 
 * **The abstraction barrier** is in full force in this project, as not only does it separate the user from the program code, it also separates the backend from the frontend code. In this way, the abstraction barrier is kept at both the user level and the code level.
 
 ##External Technology and Libraries
@@ -44,14 +43,12 @@ This expression reads in a regular expression and elegantly matches it against a
   matches)
 ```
 
-##Additional Remarks
-Anything else you want to say in your report. Can rename or remove this section.
-
 #How to Download and Run
 You may want to link to your latest release for easy downloading by people (such as Mark).
 
-Include what file to run, what to do with that file, how to interact with the app when its running, etc. 
+To run, load the GUIbase.rkt file into DrRacket and run it (You do need to have test.rkt in the same directory).
 
+#Changelog
 V1.1
 Photobench, now with:
 
