@@ -78,8 +78,9 @@
                         ; Button Click, changes the message
                         [callback (lambda (button event)
                                     (send (send canvas get-dc) draw-bitmap fm 0 0);(open-file "file.bmp" canvas)
-                                    (send fm;(read-bitmap "file.bmp") 
-                                          save-file "data.png" 'png))]))
+                                    (send fm save-file "data.png" 'png)
+                                    (setheight)
+                                    (setwidth))]))
 
 (define colorbutton (new button% [parent iconpanel]
                          [label "Color Balance"]
@@ -158,7 +159,7 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
-                              (send (send canvas get-dc) erase)
+                              (send dc erase)
                               (send (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
                                               (read-bitmap "data.png"))
@@ -175,7 +176,7 @@
                                      (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
                                            save-file "data.png" 'png)]
                                     [else 'none]) 
-                              (open-file "data.png" canvas)
+                              (send dc draw-bitmap (read-bitmap "data.png") 0 0)
                               (send gwdia show #f)
                               )]))
 
@@ -186,20 +187,16 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 (send (send canvas get-dc) erase)
+                                 (send dc erase)
                                  (send (dispatch 'enhance-red 
                                                  (/ (send rslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
+                                                 (dispatch 'enhance-green
+                                                           (/ (send gslider get-value) 100) 
+                                                           (dispatch 'enhance-blue
+                                                                     (/ (send bslider get-value) 100) 
+                                                                     (read-bitmap "data.png"))))
                                        save-file "data.png" 'png)
-                                 (send (dispatch 'enhance-green
-                                                 (/ (send gslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
-                                       save-file "data.png" 'png)
-                                 (send (dispatch 'enhance-blue
-                                                 (/ (send bslider get-value) 100) 
-                                                 (read-bitmap "data.png"))
-                                       save-file "data.png" 'png)
-                                 (open-file "data.png" canvas)
+                                 (send dc draw-bitmap (read-bitmap "data.png") 0 0)
                                  ;                                 (send (send canvas get-dc)
                                  ;                                      draw-bitmap
                                  ;                                     (dispatch 'enhance-red
@@ -219,7 +216,7 @@
                                  ;                                                     (/ (send bslider get-value) 100)
                                  ;                                                    fm;(read-bitmap "file.bmp")
                                  ;                                                   ))) save-file "data.png" 'png)
-                                 ;              (send colDialog show #f)
+                                 (send colDialog show #f)
                                  )]))
 
 
@@ -227,7 +224,9 @@
 (define spin (new button% [parent iconpanel]
                   [label "Spin"]
                   [callback (lambda (button event)
-                              (send (send canvas get-dc) rotate 3))]))
+                              (send dc set-origin (/ imgheight 2) (/ imgwidth 2))
+                              (send dc rotate (/ pi 4))
+                              (send dc draw-bitmap (read-bitmap "data.png") 0 0))]))
 
 
 
@@ -249,4 +248,15 @@
       (send fm-dc draw-ellipse 32 44 192 192))
     260 240)))
 
+;; Background code
 
+;shortcut to define the drawing context of the canvas
+(define dc (send canvas get-dc))
+
+(define imgheight 0)
+
+(define imgwidth 0)
+
+(define (setheight) (set! imgheight (send (read-bitmap "data.png") get-height)))
+
+(define (setwidth) (set! imgwidth (send (read-bitmap "data.png") get-width)))
