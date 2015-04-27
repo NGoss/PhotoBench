@@ -44,7 +44,7 @@ This expression reads in a regular expression and elegantly matches it against a
 ```
 
 #How to Download and Run
-You may want to link to your latest release for easy downloading by people (such as Mark).
+[Latest release is here.](https://github.com/oplS15projects/PhotoBench/releases)
 
 To run, load the GUIbase.rkt file into DrRacket and run it (You do need to have test.rkt in the same directory).
 
@@ -70,3 +70,5 @@ V1.0
 * Base GUI added
 
 * Image handling
+
+
