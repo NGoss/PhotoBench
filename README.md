@@ -33,14 +33,25 @@ define (dispatch method k)
 (provide dispatch)
 ```
 ####Eric
-This expression reads in a regular expression and elegantly matches it against a pre-existing hashmap....
+My favorite bit of code is basically the implementation of one of the OK buttons.  There's a lot to it, but it's really quite simple.  This is one of the linkages between the color handling/drawing code and the GUI iteself.  It crosses the abstraction barrier and allows the program to work.  It trusts the dispatch that is provided and trusts the GUI itself to do its part.
 ```scheme
-(let* ((expr (convert-to-regexp (read-line my-in-port)))
-             (matches (flatten
-                       (hash-map *words*
-                                 (lambda (key value)
-                                   (if (regexp-match expr key) key '()))))))
-  matches)
+(define colorOk (new button% [parent colDialog]
+                     [label "OK"]
+                     ; Button Click, changes the message
+                     [callback (lambda (button event)
+                                 (send msg set-label "LINK UP")
+                                 (send dc erase)
+                                 (send (dispatch 'enhance-red 
+                                                 (/ (send rslider get-value) 100) 
+                                                 (dispatch 'enhance-green
+                                                           (/ (send gslider get-value) 100) 
+                                                           (dispatch 'enhance-blue
+                                                                     (/ (send bslider get-value) 100) 
+                                                                     (read-bitmap "data.png"))))
+                                       save-file "data.png" 'png)
+                                 (send dc draw-bitmap (read-bitmap "data.png") 0 0)
+                                 (send colDialog show #f)
+                                 )]))
 ```
 
 #How to Download and Run
