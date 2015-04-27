@@ -20,7 +20,7 @@ For this project, we used the [/images/flomap](docs.racket-lang.org/images/floma
 ####Nathan
 My favorite piece of code for this project is a little long, but is an important piece of the backend, as it allowed me to only give the frontend access to one procedure, instead of all of them. Using this code, all procedure calls from the frontend simply go through this and are routed to the desired procedure.
 ```scheme
-define (dispatch method k)
+(define (dispatch method k)
   (define fm (bitmap->flomap base-image))
     (cond
       ((eq? method 'enhance-blue) (flomap->bitmap (enhance-blue fm k)))
@@ -35,10 +35,10 @@ define (dispatch method k)
 ####Eric
 My favorite bit of code is basically the implementation of one of the OK buttons.  There's a lot to it, but it's really quite simple.  This is one of the linkages between the color handling/drawing code and the GUI iteself.  It crosses the abstraction barrier and allows the program to work.  It trusts the dispatch that is provided and trusts the GUI itself to do its part.
 ```scheme
-(define colorOk (new button% [parent colDialog]
-                     [label "OK"]
+(define colorOk (new button% (parent colDialog)
+                     (label "OK")
                      ; Button Click, changes the message
-                     [callback (lambda (button event)
+                     (callback (lambda (button event)
                                  (send msg set-label "LINK UP")
                                  (send dc erase)
                                  (send (dispatch 'enhance-red 
@@ -51,7 +51,7 @@ My favorite bit of code is basically the implementation of one of the OK buttons
                                        save-file "data.png" 'png)
                                  (send dc draw-bitmap (read-bitmap "data.png") 0 0)
                                  (send colDialog show #f)
-                                 )]))
+                                 ))))
 ```
 
 #How to Download and Run
