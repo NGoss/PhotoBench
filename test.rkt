@@ -105,14 +105,14 @@
 
 (define (erase x y bmp)
   (define-values (bmp-x bmp-y) (flomap-size (bitmap->flomap bmp)))
-  (fm+ (bitmap->flomap bmp)
+  (fm- (bitmap->flomap bmp)
        (draw-flomap
         (lambda (fm-dc)
           (send fm-dc set-alpha 0)
-          (send fm-dc set-background "black")
+          (send fm-dc set-background "white")
           (send fm-dc clear)
           (send fm-dc set-alpha 1)
-          (send fm-dc set-pen "white" 15 'dot)
+          (send fm-dc set-pen "black" 15 'dot)
           (send fm-dc draw-point x y))
         bmp-x bmp-y)))
 
