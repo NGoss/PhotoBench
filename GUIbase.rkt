@@ -7,6 +7,15 @@
 
 
 
+;;;TO BE CAHNGED FURTHER
+;Spin needs to properly center, without clipping
+;;Spin also needs a user selected number
+;Open Needs a user selected filename
+;Undo
+;Redo
+;Do trig on line drawings so that spin doesn't break it
+
+
 ;output file
 ;(define out (open-output-file "data.png" #:exists 'replace))
 
@@ -63,7 +72,7 @@
                    [parent menuedit]
                    [callback (lambda (b e)(send msg set-label "doing edit stuff"))]))
 
-;USed for spacing
+;Used for spacing, Contains the lefthand buttons
 (define overall (new horizontal-panel% [parent frame]
                      ))
 
@@ -75,12 +84,13 @@
 
 (define openbutton (new button% [parent iconpanel]
                         [label "Open"]
-                        ; Button Click, changes the message
                         [callback (lambda (button event)
-                                    (send (send canvas get-dc) draw-bitmap fm 0 0);(open-file "file.bmp" canvas)
                                     (send fm save-file "data.png" 'png)
                                     (setheight)
-                                    (setwidth))]))
+                                    (setwidth)
+                                    (send dc set-origin (/ imgwidth 2) (/ imgheight 2))
+                                    (redraw)
+                                    )]))
 
 (define colorbutton (new button% [parent iconpanel]
                          [label "Color Balance"]
@@ -89,12 +99,68 @@
 
 (define gwbutton (new button% [parent iconpanel]
                       [label "Gamma/White"]
-                      ; Button Click, changes the message
                       [callback (lambda (button event)
                                   (send gwdia show #t))]))
 
-(define canvas (new canvas% [parent overall]
+(define spin (new button% [parent iconpanel]
+                  [label "Spin"]
+                  [callback (lambda (button event)
+                              (send dc rotate (/ pi 8))
+                              (redraw)
+                              )]))
+
+(define brushbox (new list-box% [parent (new horizontal-panel% 
+                                             (parent iconpanel)
+                                             (min-height 150)
+                                             (stretchable-height #f))]
+                      [label "Brushes"]
+                      [choices (list "Freeform" "Line" "Erase" "None")]
+                      [style (list 'single 'vertical-label)]
+                      [callback (λ (c e) 
+                                  (cond ((send brushbox is-selected? 0) (set! mode 'freeform))
+                                        ((send brushbox is-selected? 1) (set! mode 'line))
+                                        ((send brushbox is-selected? 2) (set! mode 'erase))
+                                        (else (set! mode 'none))))]))
+
+
+
+(define my-canvas%
+  (class canvas%
+    (define/override (on-event event)
+      (cond [(and (equal? mode 'line) (send event button-down? 'left)) 
+             (set! pt1 (cons (send event get-x) (send event get-y)))]
+            [(and (equal? mode 'line) (send event button-up? 'left)) 
+             (set! pt2 (cons (send event get-x) (send event get-y)))
+             (send (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) (read-bitmap "data.png"))) save-file "data.png" 'png)
+             (redraw)]
+            [(and (equal? mode 'freeform) (send event button-down? 'left))
+             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
+            [(and (equal? mode 'freeform) (send event dragging?))
+             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
+             (send dc erase)
+             (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
+            [(and (equal? mode 'freeform) (send event button-up? 'left))
+             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
+             (send tempmap save-file "data.png" 'png)
+             (redraw)]
+            [(and (equal? mode 'erase) (send event button-down? 'left))
+             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
+            [(and (equal? mode 'erase) (send event dragging?))
+             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
+             (send dc erase)
+             (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
+            [(and (equal? mode 'erase) (send event button-up? 'left))
+             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
+             (send tempmap save-file "data.png" 'png)
+             (redraw)]
+             ))
+    (super-new)))
+
+
+
+(define canvas (new my-canvas% [parent overall]
                     [style '(border)]))
+
 
 (send frame show #t)
 
@@ -159,7 +225,6 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
-                              (send dc erase)
                               (send (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
                                               (read-bitmap "data.png"))
@@ -176,7 +241,7 @@
                                      (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
                                            save-file "data.png" 'png)]
                                     [else 'none]) 
-                              (send dc draw-bitmap (read-bitmap "data.png") 0 0)
+                              (redraw)
                               (send gwdia show #f)
                               )]))
 
@@ -187,7 +252,6 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 (send dc erase)
                                  (send (dispatch 'enhance-red 
                                                  (/ (send rslider get-value) 100) 
                                                  (dispatch 'enhance-green
@@ -196,37 +260,10 @@
                                                                      (/ (send bslider get-value) 100) 
                                                                      (read-bitmap "data.png"))))
                                        save-file "data.png" 'png)
-                                 (send dc draw-bitmap (read-bitmap "data.png") 0 0)
-                                 ;                                 (send (send canvas get-dc)
-                                 ;                                      draw-bitmap
-                                 ;                                     (dispatch 'enhance-red
-                                 ;                                              (/ (send rslider get-value) 100)
-                                 ;                                             (dispatch 'enhance-green
-                                 ;                                                   (/ (send gslider get-value) 100)
-                                 ;                                                      (dispatch 'enhance-blue
-                                 ;                                                               (/ (send bslider get-value) 100)
-                                 ;                                                              fm)));(read-bitmap "file.bmp"))
-                                 ;                              0
-                                 ;                             0)
-                                 ;                      (send (dispatch 'enhance-red
-                                 ;                                     (/ (send rslider get-value) 100)
-                                 ;                                    (dispatch 'enhance-green
-                                 ;                                             (/ (send gslider get-value) 100)
-                                 ;                                            (dispatch 'enhance-blue
-                                 ;                                                     (/ (send bslider get-value) 100)
-                                 ;                                                    fm;(read-bitmap "file.bmp")
-                                 ;                                                   ))) save-file "data.png" 'png)
+                                 (redraw)
                                  (send colDialog show #f)
                                  )]))
 
-
-;;;spin button temporarily removed
-(define spin (new button% [parent iconpanel]
-                  [label "Spin"]
-                  [callback (lambda (button event)
-                              (send dc set-origin (/ imgheight 2) (/ imgwidth 2))
-                              (send dc rotate (/ pi 4))
-                              (send dc draw-bitmap (read-bitmap "data.png") 0 0))]))
 
 
 
@@ -260,3 +297,15 @@
 (define (setheight) (set! imgheight (send (read-bitmap "data.png") get-height)))
 
 (define (setwidth) (set! imgwidth (send (read-bitmap "data.png") get-width)))
+
+(define mode 0)
+
+(define pt1 (cons 0 0))
+
+(define pt2 (cons 0 0))
+
+(define redraw (λ () (send dc erase)
+                 (send dc draw-bitmap (read-bitmap "data.png") (/ imgwidth -2) (/ imgheight -2))))
+
+(define tempmap 0)
+
