@@ -85,6 +85,7 @@
 (define openbutton (new button% [parent iconpanel]
                         [label "Open"]
                         [callback (lambda (button event)
+                                    (send dc set-rotation 0)
                                     (send fm save-file "data.png" 'png)
                                     (setheight)
                                     (setwidth)
@@ -102,12 +103,14 @@
                       [callback (lambda (button event)
                                   (send gwdia show #t))]))
 
-(define spin (new button% [parent iconpanel]
-                  [label "Spin"]
-                  [callback (lambda (button event)
-                              (send dc rotate (/ pi 8))
-                              (redraw)
-                              )]))
+;;;;;;;;;SPIN ISN OW UNSUPPORTED
+;(define spin (new button% [parent iconpanel]
+;                  [label "Spin"]
+;                  [callback (lambda (button event)
+;                              (send dc rotate (/ pi 8))
+;                              (set! rotate (+ rotate (/ pi 8)))
+;                              (redraw)
+;                              )]))
 
 (define brushbox (new list-box% [parent (new horizontal-panel% 
                                              (parent iconpanel)
@@ -133,6 +136,7 @@
              (set! pt2 (cons (send event get-x) (send event get-y)))
              (send (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) (read-bitmap "data.png"))) save-file "data.png" 'png)
              (redraw)]
+            
             [(and (equal? mode 'freeform) (send event button-down? 'left))
              (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
             [(and (equal? mode 'freeform) (send event dragging?))
@@ -143,6 +147,7 @@
              (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
              (send tempmap save-file "data.png" 'png)
              (redraw)]
+            
             [(and (equal? mode 'erase) (send event button-down? 'left))
              (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
             [(and (equal? mode 'erase) (send event dragging?))
@@ -153,7 +158,7 @@
              (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
              (send tempmap save-file "data.png" 'png)
              (redraw)]
-             ))
+            ))
     (super-new)))
 
 
@@ -307,5 +312,15 @@
 (define redraw (λ () (send dc erase)
                  (send dc draw-bitmap (read-bitmap "data.png") (/ imgwidth -2) (/ imgheight -2))))
 
-(define tempmap 0)
+(define tempmap (read-bitmap "data.png"))
+
+(define rotate 0)
+
+(define (trigx ptvalue)
+  (+ (* (cos rotate) (car ptvalue))
+     (* (sin rotate) (cdr ptvalue))))
+
+(define (trigy ptvalue)
+  (- (* (cos rotate) (cdr ptvalue))
+     (* (sin rotate) (car ptvalue))))
 
