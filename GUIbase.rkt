@@ -260,7 +260,7 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
-                              (set! maximg (- counter 1))
+                              (set! maximg counter)
                               (save (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
                                               (dispatch 'saturation
@@ -282,7 +282,7 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 (set! maximg (- counter 1))
+                                 (set! maximg counter)
                                  (save (dispatch 'enhance-red 
                                                  (/ (send rslider get-value) 100) 
                                                  (dispatch 'enhance-green
