@@ -8,12 +8,8 @@
 
 
 ;;;TO BE CAHNGED FURTHER
-;Spin needs to properly center, without clipping
-;;Spin also needs a user selected number
-;Open Needs a user selected filename
 ;Undo
 ;Redo
-;Do trig on line drawings so that spin doesn't break it
 
 
 ;output file
@@ -48,13 +44,14 @@
                       [parent menufile]
                       [callback (lambda (b e) (let ((m (new dialog% [label "Are you sure?"]
                                                             [parent frame])))
-                                                (define n (new text-field% [label "Name:"] [parent m] [init-value "data.png"]))
+                                                (define n (new text-field% [label "Name:"] [parent m] [init-value "data"]))
                                                 (define o (new button% [parent m]
                                                                [label "OK"]
                                                                [callback (lambda (button event)
                                                                            (rename-file-or-directory "data.png"
                                                                                                      (string-append (send n get-value)
-                                                                                                                    ".png")))]))
+                                                                                                                    ".png"))
+                                                                           (send m show #f))]))
                                                 (define p (new button% [parent m]
                                                                [label "Close"]
                                                                [callback (lambda (button event)
@@ -82,16 +79,32 @@
                        [min-width 100]
                        [stretchable-width #f]))
 
-(define openbutton (new button% [parent iconpanel]
-                        [label "Open"]
-                        [callback (lambda (button event)
-                                    (send dc set-rotation 0)
-                                    (send fm save-file "data.png" 'png)
-                                    (setheight)
-                                    (setwidth)
-                                    (send dc set-origin (/ imgwidth 2) (/ imgheight 2))
-                                    (redraw)
-                                    )]))
+(define openbutton 
+  (new button% [parent iconpanel]
+       [label "Open"]
+       [callback 
+        (lambda (button event)
+          (let ((m (new dialog% [label "Open"]
+                        [parent frame])))
+            (define n (new text-field% [label "File Name:"] [parent m] [init-value "fm"]))
+            (define o (new button% [parent m]
+                           [label "OK"]
+                           [callback (lambda (button event)
+                                       (cond [(equal? (send n get-value) "fm") 
+                                              (send fm save-file "data.png" 'png)
+                                              (setheight)
+                                              (setwidth)
+                                              (send dc set-origin (/ imgwidth 2) (/ imgheight 2))
+                                              (redraw)]
+                                             [else (send (read-bitmap (send n get-value)) save-file "data.png" 'png)
+                                                   (redraw)])
+                                       (send m show #f)
+                                       )]))
+            (define p (new button% [parent m]
+                           [label "Close"]
+                           [callback (lambda (button event)
+                                       (send m show #f))]))
+            (send m show #t)))]))
 
 (define colorbutton (new button% [parent iconpanel]
                          [label "Color Balance"]
@@ -312,7 +325,7 @@
 (define redraw (λ () (send dc erase)
                  (send dc draw-bitmap (read-bitmap "data.png") (/ imgwidth -2) (/ imgheight -2))))
 
-(define tempmap (read-bitmap "data.png"))
+(define tempmap 0)
 
 (define rotate 0)
 
