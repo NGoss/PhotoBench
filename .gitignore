@@ -1,3 +1,4 @@
 *.bak
 *.dep
 compiled/drracket/errortrace/test_rkt.zo
+*.db

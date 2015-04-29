@@ -48,7 +48,7 @@
                                                                [label "OK"]
                                                                [callback (lambda (button event)
                                                                            (send current save-file (string-append (send n get-value)
-                                                                                                          ".png") 'png)
+                                                                                                                  ".png") 'png)
                                                                            (send m show #f))]))
                                                 (define p (new button% [parent m]
                                                                [label "Close"]
@@ -88,10 +88,12 @@
             (define o (new button% [parent m]
                            [label "OK"]
                            [callback (lambda (button event)
-                                       (cond [(equal? (send n get-value) "fm") 
+                                       (cond [(equal? (send n get-value) "fm")
+                                              (set! maximg 0)
                                               (save fm)
                                               (load (- counter 1))]
-                                             [else (save (read-bitmap (send n get-value)))
+                                             [else (set! maximg 0)
+                                                   (save (read-bitmap (send n get-value)))
                                                    (load (- counter 1))])
                                        (send m show #f)
                                        )]))
@@ -137,9 +139,19 @@
                   [label "Undo"]
                   [callback (λ (button event) 
                               (set! counter (- counter 1))
-                              (set! maximg (- maximg 1))
+                              (set! current (read-bitmap (string-append "data\\data"
+                                             (number->string (- counter 1) 10)
+                                             ".png")))
                               (load (- counter 1)))]))
 
+(define redo (new button% [parent iconpanel]
+                  [label "Redo"]
+                  [callback (λ (button event) 
+                              (set! counter (+ counter 1))
+                              (set! current (read-bitmap (string-append "data\\data"
+                                             (number->string (- counter 1) 10)
+                                             ".png")))
+                              (load (- counter 1)))]))
 
 
 (define my-canvas%
@@ -149,6 +161,7 @@
              (set! pt1 (cons (send event get-x) (send event get-y)))]
             [(and (equal? mode 'line) (send event button-up? 'left)) 
              (set! pt2 (cons (send event get-x) (send event get-y)))
+             (set! maximg counter)
              (save (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) current)))
              (load (- counter 1))]
             
@@ -160,6 +173,7 @@
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'freeform) (send event button-up? 'left))
              (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
+             (set! maximg counter)
              (save tempmap)
              (load (- counter 1))]
             
@@ -171,6 +185,7 @@
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'erase) (send event button-up? 'left))
              (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
+             (set! maximg counter)
              (save tempmap)
              (load (- counter 1))]
             ))
@@ -245,6 +260,7 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
+                              (set! maximg (- counter 1))
                               (save (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
                                               (dispatch 'saturation
@@ -266,6 +282,7 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
+                                 (set! maximg (- counter 1))
                                  (save (dispatch 'enhance-red 
                                                  (/ (send rslider get-value) 100) 
                                                  (dispatch 'enhance-green
