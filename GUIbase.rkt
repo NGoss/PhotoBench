@@ -7,8 +7,7 @@
 
 
 
-;;;TO BE CAHNGED FURTHER
-;Undo
+;;;TO BE CAHNGED implemented
 ;Redo
 
 
@@ -48,9 +47,8 @@
                                                 (define o (new button% [parent m]
                                                                [label "OK"]
                                                                [callback (lambda (button event)
-                                                                           (rename-file-or-directory "data.png"
-                                                                                                     (string-append (send n get-value)
-                                                                                                                    ".png"))
+                                                                           (send current save-file (string-append (send n get-value)
+                                                                                                          ".png") 'png)
                                                                            (send m show #f))]))
                                                 (define p (new button% [parent m]
                                                                [label "Close"]
@@ -91,13 +89,10 @@
                            [label "OK"]
                            [callback (lambda (button event)
                                        (cond [(equal? (send n get-value) "fm") 
-                                              (send fm save-file "data.png" 'png)
-                                              (setheight)
-                                              (setwidth)
-                                              (send dc set-origin (/ imgwidth 2) (/ imgheight 2))
-                                              (redraw)]
-                                             [else (send (read-bitmap (send n get-value)) save-file "data.png" 'png)
-                                                   (redraw)])
+                                              (save fm)
+                                              (load (- counter 1))]
+                                             [else (save (read-bitmap (send n get-value)))
+                                                   (load (- counter 1))])
                                        (send m show #f)
                                        )]))
             (define p (new button% [parent m]
@@ -138,6 +133,13 @@
                                         ((send brushbox is-selected? 2) (set! mode 'erase))
                                         (else (set! mode 'none))))]))
 
+(define undo (new button% [parent iconpanel]
+                  [label "Undo"]
+                  [callback (λ (button event) 
+                              (set! counter (- counter 1))
+                              (set! maximg (- maximg 1))
+                              (load (- counter 1)))]))
+
 
 
 (define my-canvas%
@@ -147,30 +149,30 @@
              (set! pt1 (cons (send event get-x) (send event get-y)))]
             [(and (equal? mode 'line) (send event button-up? 'left)) 
              (set! pt2 (cons (send event get-x) (send event get-y)))
-             (send (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) (read-bitmap "data.png"))) save-file "data.png" 'png)
-             (redraw)]
+             (save (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) current)))
+             (load (- counter 1))]
             
             [(and (equal? mode 'freeform) (send event button-down? 'left))
-             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
+             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) current)))]
             [(and (equal? mode 'freeform) (send event dragging?))
              (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
              (send dc erase)
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'freeform) (send event button-up? 'left))
              (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
-             (send tempmap save-file "data.png" 'png)
-             (redraw)]
+             (save tempmap)
+             (load (- counter 1))]
             
             [(and (equal? mode 'erase) (send event button-down? 'left))
-             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) (read-bitmap "data.png"))))]
+             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) current)))]
             [(and (equal? mode 'erase) (send event dragging?))
              (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
              (send dc erase)
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'erase) (send event button-up? 'left))
              (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
-             (send tempmap save-file "data.png" 'png)
-             (redraw)]
+             (save tempmap)
+             (load (- counter 1))]
             ))
     (super-new)))
 
@@ -243,23 +245,17 @@
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
                   [callback (lambda (button event)
-                              (send (dispatch 'gamma 
+                              (save (dispatch 'gamma 
                                               (/ (send gammaslider get-value) 100) 
-                                              (read-bitmap "data.png"))
-                                    save-file "data.png" 'png)
-                              (send (dispatch 'saturation
-                                              (/ (send satslider get-value) 100) 
-                                              (read-bitmap "data.png"))
-                                    save-file "data.png" 'png)
-                              (cond [(equal? (send wbal get-selections) '()) 'none]
-                                    [(= 0 (car (send wbal get-selections))) 
-                                     (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
-                                           save-file "data.png" 'png)]
-                                    [(= 1 (car (send wbal get-selections))) 
-                                     (send (dispatch 'white-balance 'fluorescent (read-bitmap "data.png"))
-                                           save-file "data.png" 'png)]
-                                    [else 'none]) 
-                              (redraw)
+                                              (dispatch 'saturation
+                                                        (/ (send satslider get-value) 100) 
+                                                        (cond [(equal? (send wbal get-selections) '()) 'none]
+                                                              [(= 0 (car (send wbal get-selections))) 
+                                                               (dispatch 'white-balance 'fluorescent current)]
+                                                              [(= 1 (car (send wbal get-selections))) 
+                                                               (dispatch 'white-balance 'fluorescent current)]
+                                                              [else 'none]))))
+                              (load (- counter 1))
                               (send gwdia show #f)
                               )]))
 
@@ -270,15 +266,14 @@
                      ; Button Click, changes the message
                      [callback (lambda (button event)
                                  (send msg set-label "LINK UP")
-                                 (send (dispatch 'enhance-red 
+                                 (save (dispatch 'enhance-red 
                                                  (/ (send rslider get-value) 100) 
                                                  (dispatch 'enhance-green
                                                            (/ (send gslider get-value) 100) 
                                                            (dispatch 'enhance-blue
                                                                      (/ (send bslider get-value) 100) 
-                                                                     (read-bitmap "data.png"))))
-                                       save-file "data.png" 'png)
-                                 (redraw)
+                                                                     current))))
+                                 (load (- counter 1))
                                  (send colDialog show #f)
                                  )]))
 
@@ -323,7 +318,7 @@
 (define pt2 (cons 0 0))
 
 (define redraw (λ () (send dc erase)
-                 (send dc draw-bitmap (read-bitmap "data.png") (/ imgwidth -2) (/ imgheight -2))))
+                 (send dc draw-bitmap (read-bitmap "data.png") 0 0)))
 
 (define tempmap 0)
 
@@ -336,4 +331,25 @@
 (define (trigy ptvalue)
   (- (* (cos rotate) (cdr ptvalue))
      (* (sin rotate) (car ptvalue))))
+
+(define maximg 0)
+
+(define counter 0)
+
+(define (load in)     ;;code for undo/redo
+  (send dc erase)
+  (send dc draw-bitmap (read-bitmap (string-append "data\\data"
+                                                   (number->string in 10)
+                                                   ".png")) 0 0))
+
+(define (save in) (send in save-file (string-append "data\\data"
+                                                    (number->string maximg 10)
+                                                    ".png") 'png)
+  (set! current  (read-bitmap (string-append "data\\data"
+                                             (number->string maximg 10)
+                                             ".png")))
+  (set! counter (+ counter 1))
+  (set! maximg (+ maximg 1)))
+
+(define current 0)
 
