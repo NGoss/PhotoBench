@@ -90,9 +90,11 @@
                            [callback (lambda (button event)
                                        (cond [(equal? (send n get-value) "fm")
                                               (set! maximg 0)
+                                              (set! counter 0)
                                               (save fm)
                                               (load (- counter 1))]
                                              [else (set! maximg 0)
+                                                   (set! counter 0)
                                                    (save (read-bitmap (send n get-value)))
                                                    (load (- counter 1))])
                                        (send m show #f)
@@ -113,15 +115,6 @@
                       [callback (lambda (button event)
                                   (send gwdia show #t))]))
 
-;;;;;;;;;SPIN ISN OW UNSUPPORTED
-;(define spin (new button% [parent iconpanel]
-;                  [label "Spin"]
-;                  [callback (lambda (button event)
-;                              (send dc rotate (/ pi 8))
-;                              (set! rotate (+ rotate (/ pi 8)))
-;                              (redraw)
-;                              )]))
-
 (define brushbox (new list-box% [parent (new horizontal-panel% 
                                              (parent iconpanel)
                                              (min-height 150)
@@ -129,6 +122,7 @@
                       [label "Brushes"]
                       [choices (list "Freeform" "Line" "Erase" "None")]
                       [style (list 'single 'vertical-label)]
+                      [selection 3]
                       [callback (λ (c e) 
                                   (cond ((send brushbox is-selected? 0) (set! mode 'freeform))
                                         ((send brushbox is-selected? 1) (set! mode 'line))
@@ -138,20 +132,40 @@
 (define undo (new button% [parent iconpanel]
                   [label "Undo"]
                   [callback (λ (button event) 
-                              (set! counter (- counter 1))
-                              (set! current (read-bitmap (string-append "data\\data"
-                                             (number->string (- counter 1) 10)
-                                             ".png")))
-                              (load (- counter 1)))]))
+                              (cond [(<= counter 1) 
+                                     (let ((m (new dialog% [label "Error"]
+                                                   [parent frame])))
+                                       (define n (new message% [label "You cannot undo what is not there."] [parent m]))
+                                       (define o (new button% [parent m]
+                                                      [label "OK"]
+                                                      [callback (lambda (button event)
+                                                                  (send m show #f))]))
+                                       (send m show #t))]
+                                    [else 
+                                     (set! counter (- counter 1))
+                                     (set! current (read-bitmap (string-append "data\\data"
+                                                                               (number->string (- counter 1) 10)
+                                                                               ".png")))
+                                     (load (- counter 1))]))]))
 
 (define redo (new button% [parent iconpanel]
                   [label "Redo"]
                   [callback (λ (button event) 
-                              (set! counter (+ counter 1))
-                              (set! current (read-bitmap (string-append "data\\data"
-                                             (number->string (- counter 1) 10)
-                                             ".png")))
-                              (load (- counter 1)))]))
+                              (cond [(equal? counter maximg) 
+                                     (let ((m (new dialog% [label "Error"]
+                                                   [parent frame])))
+                                       (define n (new message% [label "You cannot redo the future."] [parent m]))
+                                       (define o (new button% [parent m]
+                                                      [label "OK"]
+                                                      [callback (lambda (button event)
+                                                                  (send m show #f))]))
+                                       (send m show #t))]
+                                    [else 
+                                     (set! counter (+ counter 1))
+                                     (set! current (read-bitmap (string-append "data\\data"
+                                                                               (number->string (- counter 1) 10)
+                                                                               ".png")))
+                                     (load (- counter 1))]))]))
 
 
 (define my-canvas%
@@ -255,7 +269,8 @@
 (define wbal (new list-box%
                   (label "White Balance    ")
                   (parent gwdia)
-                  (choices (list "Fluorescent" "Outdoors" "None"))))
+                  (choices (list "Fluorescent" "Outdoors" "None"))
+                  (selection 2)))
 
 (define gwOk (new button% [parent gwdia]
                   [label "OK"]
