@@ -60,6 +60,31 @@ My favorite bit of code is basically the implementation of one of the OK buttons
 To run, load the GUIbase.rkt file into DrRacket and run it (You do need to have test.rkt in the same directory).
 
 #Changelog
+V2.0  --PHOTO FINISH--
+This is the final release of Photobench.
+
+Things changed from the demo:
+
+* Backend cleanup for further modularity and consistency in code.
+
+* Text boxes now have default selections for readability.
+
+* Undo and Redo fixed so that you can't undo from nothing or redo at max.
+
+* Comments added to code for future viewers.
+
+* And other minor bugfixes.
+
+
+V1.2  --DEMO RELEASE--
+
+* Addition of Undo/Redo buttons
+
+* Choice of 3 brushes: Freeform, Line, and Erase.
+
+* Full implementation of Save and Open
+
+
 V1.1
 Photobench, now with:
 
