@@ -162,29 +162,29 @@
             [(and (equal? mode 'line) (send event button-up? 'left)) 
              (set! pt2 (cons (send event get-x) (send event get-y)))
              (set! maximg counter)
-             (save (flomap->bitmap (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) current)))
+             (save (line-brush (car pt1) (car pt2) (cdr pt1) (cdr pt2) current))
              (load (- counter 1))]
             
             [(and (equal? mode 'freeform) (send event button-down? 'left))
-             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) current)))]
+             (set! tempmap (freeform-brush (send event get-x) (send event get-y) current))]
             [(and (equal? mode 'freeform) (send event dragging?))
-             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
+             (set! tempmap (freeform-brush (send event get-x) (send event get-y) tempmap))
              (send dc erase)
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'freeform) (send event button-up? 'left))
-             (set! tempmap (flomap->bitmap (freeform-brush (send event get-x) (send event get-y) tempmap)))
+             (set! tempmap (freeform-brush (send event get-x) (send event get-y) tempmap))
              (set! maximg counter)
              (save tempmap)
              (load (- counter 1))]
             
             [(and (equal? mode 'erase) (send event button-down? 'left))
-             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) current)))]
+             (set! tempmap (erase (send event get-x) (send event get-y) current))]
             [(and (equal? mode 'erase) (send event dragging?))
-             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
+             (set! tempmap (erase (send event get-x) (send event get-y) tempmap))
              (send dc erase)
              (send dc draw-bitmap tempmap (/ imgwidth -2) (/ imgheight -2))]
             [(and (equal? mode 'erase) (send event button-up? 'left))
-             (set! tempmap (flomap->bitmap (erase (send event get-x) (send event get-y) tempmap)))
+             (set! tempmap (erase (send event get-x) (send event get-y) tempmap))
              (set! maximg counter)
              (save tempmap)
              (load (- counter 1))]
